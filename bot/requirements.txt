@@ -1,0 +1,4 @@
+aiogram==3.23.0
+aiogram-dialog==2.4.0
+httpx==0.28.1
+python-dotenv==1.2.1

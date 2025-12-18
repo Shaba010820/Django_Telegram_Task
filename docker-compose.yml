@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: tasknest_postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: tasknest_redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: tasknest_backend
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:8000
+      "
+
+  celery:
+    build: ./backend
+    container_name: tasknest_celery
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+    command: celery -A config worker -l info
+
+  celery-beat:
+    build: ./backend
+    container_name: tasknest_celery_beat
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+    command: celery -A config beat -l info
+
+  bot:
+    build: ./bot
+    container_name: tasknest_bot
+    env_file:
+      - .env
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -23,9 +23,9 @@ Celery Beat периодически проверяет задачи с истё
 
 4. Как запустить проект
 
-git clone 
-cd Django_tgbot
-docker-compose up --build
+- git clone https://github.com/Shaba010820/Django_Telegram_Task.git
+- cd Django_tgbot
+- docker-compose up --build
 
 5. Переменные окружения
 
